@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"fmt"
+	"maples/maples-service/infra/mysql"
 	"maples/maples-service/svc"
 	"os"
 	"os/signal"
@@ -14,8 +15,9 @@ func InterruptHandler(errc chan<- error) {
 	terminateError := fmt.Errorf("%s", <-c)
 
 	// Place whatever shutdown handling you want here
-
+	mysql.Close()
 	errc <- terminateError
+
 }
 
 func SetConfig(cfg svc.Config) svc.Config {

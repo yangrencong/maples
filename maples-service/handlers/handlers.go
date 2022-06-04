@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/pkg/errors"
-	"log"
 	pb "maples"
 	"maples/maples-service/module/entity"
 	"maples/maples-service/module/resposiitory"
@@ -54,7 +53,6 @@ func (s maplesService) UpdateUserMessage(ctx context.Context, in *pb.UserMessage
 }
 
 func (s maplesService) AddUser(ctx context.Context, in *pb.UserMessageRequest) (*pb.UserMessageResponse, error) {
-	log.Println(in)
 	user := entity.User{
 		Name:     in.Name,
 		Sex:      int(in.Sex),

@@ -29,3 +29,13 @@ func Init() error {
 	MysqlClient = db
 	return nil
 }
+
+func Close() {
+	sqlDB, _ := MysqlClient.DB()
+	err := sqlDB.Close()
+	if err != nil {
+		log.Println("Mysql Close Fatal")
+		return
+	}
+	log.Println("Mysql Close Success")
+}
