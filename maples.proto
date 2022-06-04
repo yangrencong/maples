@@ -1,0 +1,64 @@
+syntax = "proto3";
+package maples;
+
+import "github.com/metaverse/truss/deftree/googlethirdparty/annotations.proto";
+
+
+service Maples {
+
+  // Hello 测试
+  rpc Hello (HelloRequest) returns (HelloResponse) {
+    option (google.api.http) = {
+      get: "/maples/hello"
+    };
+  }
+
+  // AddUser 增加用户信息
+  rpc AddUser (UserMessageRequest) returns (UserMessageResponse) {
+    option (google.api.http) = {
+      post:"/maples/user"
+      body:"*"
+    };
+  }
+
+  //  UpdateUserMessage 更新用户信息
+  rpc UpdateUserMessage (UserMessageRequest) returns (UserMessageResponse) {
+    option (google.api.http) = {
+      post:"/maples/user_message"
+      body:"*"
+    };
+  }
+
+}
+
+message HelloRequest {
+  string name = 1;
+}
+
+
+message HelloResponse {
+  string msg = 1;
+  int64 code = 2;
+  HelloData data = 3;
+
+}
+
+message HelloData {
+  string message = 1;
+}
+
+message UserMessageRequest {
+  string name = 1;
+  int32 sex = 2;
+  string birthday = 3;
+  string phone = 4;
+}
+
+message UserMessageResponse {
+  string msg = 1;
+  int64 code = 2;
+  EmptyData data = 3;
+}
+
+message EmptyData {}
+
