@@ -136,6 +136,15 @@
         }
       }
     },
+    "maplesSex": {
+      "type": "string",
+      "enum": [
+        "DEFAULT",
+        "MALE",
+        "FEMALE"
+      ],
+      "default": "DEFAULT"
+    },
     "maplesUserMessageRequest": {
       "type": "object",
       "properties": {
@@ -143,8 +152,7 @@
           "type": "string"
         },
         "sex": {
-          "type": "integer",
-          "format": "int32"
+          "$ref": "#/definitions/maplesSex"
         },
         "birthday": {
           "type": "string"

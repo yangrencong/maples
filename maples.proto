@@ -49,9 +49,15 @@ message HelloData {
 
 message UserMessageRequest {
   string name = 1;
-  int32 sex = 2;
+  Sex sex = 2;
   string birthday = 3;
   string phone = 4;
+}
+
+enum Sex {
+  DEFAULT = 0;
+  MALE = 1;
+  FEMALE = 2;
 }
 
 message UserMessageResponse {

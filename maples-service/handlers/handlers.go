@@ -2,24 +2,24 @@ package handlers
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"github.com/pkg/errors"
 	"log"
-	"maples/maples-service/infra/mysql"
+	pb "maples"
 	"maples/maples-service/module/entity"
 	"maples/maples-service/module/resposiitory"
-	"time"
-
-	pb "maples"
 )
 
 // NewService returns a nave, stateless implementation of Service.
 func NewService() pb.MaplesServer {
-	return maplesService{}
+	return maplesService{
+		userModel: resposiitory.NewUserModel(),
+	}
 }
 
-type maplesService struct{}
+type maplesService struct {
+	userModel resposiitory.UserModel
+}
 
 func (s maplesService) Hello(ctx context.Context, in *pb.HelloRequest) (*pb.HelloResponse, error) {
 	helloMessage := fmt.Sprintf("Hello, %s", in.Name)
@@ -32,8 +32,19 @@ func (s maplesService) Hello(ctx context.Context, in *pb.HelloRequest) (*pb.Hell
 }
 
 func (s maplesService) UpdateUserMessage(ctx context.Context, in *pb.UserMessageRequest) (*pb.UserMessageResponse, error) {
-	msg, _ := json.Marshal(in)
-	log.Printf("request message is %v\n", string(msg))
+	if len(in.Phone) == 0 {
+		return nil, errors.New("update user fata")
+	}
+	user := entity.User{
+		Name:     in.Name,
+		Sex:      int(in.Sex),
+		Phone:    in.Phone,
+		Birthday: in.Birthday,
+	}
+	err := s.userModel.Update(ctx, &user)
+	if err != nil {
+		return nil, errors.New("update user fata")
+	}
 	resp := &pb.UserMessageResponse{
 		Msg:  "SUCCESS",
 		Code: 200,
@@ -43,21 +54,14 @@ func (s maplesService) UpdateUserMessage(ctx context.Context, in *pb.UserMessage
 }
 
 func (s maplesService) AddUser(ctx context.Context, in *pb.UserMessageRequest) (*pb.UserMessageResponse, error) {
-	db := mysql.MysqlClient
-	if db == nil {
-		return nil, errors.New("db error")
-	}
+	log.Println(in)
 	user := entity.User{
-		Name:       in.Name,
-		Sex:        int(in.Sex),
-		Phone:      in.Phone,
-		Birthday:   in.Birthday,
-		CreateTime: time.Now(),
-		UpdateTime: time.Now(),
+		Name:     in.Name,
+		Sex:      int(in.Sex),
+		Phone:    in.Phone,
+		Birthday: in.Birthday,
 	}
-
-	userModel := resposiitory.NewUserModel()
-	err := userModel.Create(ctx, db, &user)
+	err := s.userModel.Create(ctx, &user)
 	if err != nil {
 		return nil, errors.New("create user fata")
 	}
