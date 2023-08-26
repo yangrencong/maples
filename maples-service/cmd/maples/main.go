@@ -7,6 +7,7 @@ package main
 
 import (
 	"flag"
+	"maples/maples-service/infra/mysql"
 
 	// This Service
 	"maples/maples-service/handlers"
@@ -19,6 +20,7 @@ func main() {
 
 	cfg := server.DefaultConfig
 	cfg = handlers.SetConfig(cfg)
+	mysql.Init()
 
 	server.Run(cfg)
 }
