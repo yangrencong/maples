@@ -17,7 +17,7 @@ import (
 	grpctransport "github.com/go-kit/kit/transport/grpc"
 
 	// This Service
-	pb "maples"
+	pb "maples/pb"
 )
 
 // MakeGRPCServer makes a set of endpoints available as a gRPC MaplesServer.
@@ -47,6 +47,12 @@ func MakeGRPCServer(endpoints Endpoints, options ...grpctransport.ServerOption) 
 			EncodeGRPCUpdateUserMessageResponse,
 			serverOptions...,
 		),
+		getusermessage: grpctransport.NewServer(
+			endpoints.GetUserMessageEndpoint,
+			DecodeGRPCGetUserMessageRequest,
+			EncodeGRPCGetUserMessageResponse,
+			serverOptions...,
+		),
 	}
 }
 
@@ -55,6 +61,7 @@ type grpcServer struct {
 	hello             grpctransport.Handler
 	adduser           grpctransport.Handler
 	updateusermessage grpctransport.Handler
+	getusermessage    grpctransport.Handler
 }
 
 // Methods for grpcServer to implement MaplesServer interface
@@ -83,6 +90,14 @@ func (s *grpcServer) UpdateUserMessage(ctx context.Context, req *pb.UserMessageR
 	return rep.(*pb.UserMessageResponse), nil
 }
 
+func (s *grpcServer) GetUserMessage(ctx context.Context, req *pb.GetUserMessageRequest) (*pb.GetUserMessageResponse, error) {
+	_, rep, err := s.getusermessage.ServeGRPC(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	return rep.(*pb.GetUserMessageResponse), nil
+}
+
 // Server Decode
 
 // DecodeGRPCHelloRequest is a transport/grpc.DecodeRequestFunc that converts a
@@ -106,6 +121,13 @@ func DecodeGRPCUpdateUserMessageRequest(_ context.Context, grpcReq interface{}) 
 	return req, nil
 }
 
+// DecodeGRPCGetUserMessageRequest is a transport/grpc.DecodeRequestFunc that converts a
+// gRPC getusermessage request to a user-domain getusermessage request. Primarily useful in a server.
+func DecodeGRPCGetUserMessageRequest(_ context.Context, grpcReq interface{}) (interface{}, error) {
+	req := grpcReq.(*pb.GetUserMessageRequest)
+	return req, nil
+}
+
 // Server Encode
 
 // EncodeGRPCHelloResponse is a transport/grpc.EncodeResponseFunc that converts a
@@ -126,6 +148,13 @@ func EncodeGRPCAddUserResponse(_ context.Context, response interface{}) (interfa
 // user-domain updateusermessage response to a gRPC updateusermessage reply. Primarily useful in a server.
 func EncodeGRPCUpdateUserMessageResponse(_ context.Context, response interface{}) (interface{}, error) {
 	resp := response.(*pb.UserMessageResponse)
+	return resp, nil
+}
+
+// EncodeGRPCGetUserMessageResponse is a transport/grpc.EncodeResponseFunc that converts a
+// user-domain getusermessage response to a gRPC getusermessage reply. Primarily useful in a server.
+func EncodeGRPCGetUserMessageResponse(_ context.Context, response interface{}) (interface{}, error) {
+	resp := response.(*pb.GetUserMessageResponse)
 	return resp, nil
 }
 

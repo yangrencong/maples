@@ -16,8 +16,8 @@ import (
 	grpctransport "github.com/go-kit/kit/transport/grpc"
 
 	// This Service
-	pb "maples"
 	"maples/maples-service/svc"
+	pb "maples/pb"
 )
 
 // New returns an service backed by a gRPC client connection. It is the
@@ -75,10 +75,24 @@ func New(conn *grpc.ClientConn, options ...ClientOption) (pb.MaplesServer, error
 		).Endpoint()
 	}
 
+	var getusermessageEndpoint endpoint.Endpoint
+	{
+		getusermessageEndpoint = grpctransport.NewClient(
+			conn,
+			"maples.Maples",
+			"GetUserMessage",
+			EncodeGRPCGetUserMessageRequest,
+			DecodeGRPCGetUserMessageResponse,
+			pb.GetUserMessageResponse{},
+			clientOptions...,
+		).Endpoint()
+	}
+
 	return svc.Endpoints{
 		HelloEndpoint:             helloEndpoint,
 		AddUserEndpoint:           adduserEndpoint,
 		UpdateUserMessageEndpoint: updateusermessageEndpoint,
+		GetUserMessageEndpoint:    getusermessageEndpoint,
 	}, nil
 }
 
@@ -105,6 +119,13 @@ func DecodeGRPCUpdateUserMessageResponse(_ context.Context, grpcReply interface{
 	return reply, nil
 }
 
+// DecodeGRPCGetUserMessageResponse is a transport/grpc.DecodeResponseFunc that converts a
+// gRPC getusermessage reply to a user-domain getusermessage response. Primarily useful in a client.
+func DecodeGRPCGetUserMessageResponse(_ context.Context, grpcReply interface{}) (interface{}, error) {
+	reply := grpcReply.(*pb.GetUserMessageResponse)
+	return reply, nil
+}
+
 // GRPC Client Encode
 
 // EncodeGRPCHelloRequest is a transport/grpc.EncodeRequestFunc that converts a
@@ -125,6 +146,13 @@ func EncodeGRPCAddUserRequest(_ context.Context, request interface{}) (interface
 // user-domain updateusermessage request to a gRPC updateusermessage request. Primarily useful in a client.
 func EncodeGRPCUpdateUserMessageRequest(_ context.Context, request interface{}) (interface{}, error) {
 	req := request.(*pb.UserMessageRequest)
+	return req, nil
+}
+
+// EncodeGRPCGetUserMessageRequest is a transport/grpc.EncodeRequestFunc that converts a
+// user-domain getusermessage request to a gRPC getusermessage request. Primarily useful in a client.
+func EncodeGRPCGetUserMessageRequest(_ context.Context, request interface{}) (interface{}, error) {
+	req := request.(*pb.GetUserMessageRequest)
 	return req, nil
 }
 

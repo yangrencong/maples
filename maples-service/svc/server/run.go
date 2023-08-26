@@ -18,9 +18,9 @@ import (
 	"google.golang.org/grpc"
 
 	// This Service
-	pb "maples"
 	"maples/maples-service/handlers"
 	"maples/maples-service/svc"
+	pb "maples/pb"
 )
 
 var DefaultConfig svc.Config
@@ -56,12 +56,14 @@ func NewEndpoints(service pb.MaplesServer) svc.Endpoints {
 		helloEndpoint             = svc.MakeHelloEndpoint(service)
 		adduserEndpoint           = svc.MakeAddUserEndpoint(service)
 		updateusermessageEndpoint = svc.MakeUpdateUserMessageEndpoint(service)
+		getusermessageEndpoint    = svc.MakeGetUserMessageEndpoint(service)
 	)
 
 	endpoints := svc.Endpoints{
 		HelloEndpoint:             helloEndpoint,
 		AddUserEndpoint:           adduserEndpoint,
 		UpdateUserMessageEndpoint: updateusermessageEndpoint,
+		GetUserMessageEndpoint:    getusermessageEndpoint,
 	}
 
 	// Wrap selected Endpoints with middlewares. See handlers/middlewares.go

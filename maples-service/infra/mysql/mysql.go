@@ -8,7 +8,7 @@ import (
 )
 
 var (
-	MysqlClient *gorm.DB
+	client *gorm.DB
 )
 
 func Init() error {
@@ -26,6 +26,13 @@ func Init() error {
 		log.Printf("Mysql connect fatal!")
 		return err
 	}
-	MysqlClient = db
+	client = db
 	return nil
+}
+
+func GetMysqlClient() *gorm.DB {
+	if client == nil {
+		_ = Init()
+	}
+	return client
 }

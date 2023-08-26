@@ -1,8 +1,8 @@
 package handlers
 
 import (
-	pb "maples"
 	"maples/maples-service/svc"
+	pb "maples/pb"
 )
 
 // WrapEndpoints accepts the service's entire collection of endpoints, so that a

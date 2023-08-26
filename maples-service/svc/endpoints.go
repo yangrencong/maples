@@ -16,7 +16,7 @@ import (
 
 	"github.com/go-kit/kit/endpoint"
 
-	pb "maples"
+	pb "maples/pb"
 )
 
 // Endpoints collects all of the endpoints that compose an add service. It's
@@ -36,6 +36,7 @@ type Endpoints struct {
 	HelloEndpoint             endpoint.Endpoint
 	AddUserEndpoint           endpoint.Endpoint
 	UpdateUserMessageEndpoint endpoint.Endpoint
+	GetUserMessageEndpoint    endpoint.Endpoint
 }
 
 // Endpoints
@@ -62,6 +63,14 @@ func (e Endpoints) UpdateUserMessage(ctx context.Context, in *pb.UserMessageRequ
 		return nil, err
 	}
 	return response.(*pb.UserMessageResponse), nil
+}
+
+func (e Endpoints) GetUserMessage(ctx context.Context, in *pb.GetUserMessageRequest) (*pb.GetUserMessageResponse, error) {
+	response, err := e.GetUserMessageEndpoint(ctx, in)
+	if err != nil {
+		return nil, err
+	}
+	return response.(*pb.GetUserMessageResponse), nil
 }
 
 // Make Endpoints
@@ -99,6 +108,17 @@ func MakeUpdateUserMessageEndpoint(s pb.MaplesServer) endpoint.Endpoint {
 	}
 }
 
+func MakeGetUserMessageEndpoint(s pb.MaplesServer) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
+		req := request.(*pb.GetUserMessageRequest)
+		v, err := s.GetUserMessage(ctx, req)
+		if err != nil {
+			return nil, err
+		}
+		return v, nil
+	}
+}
+
 // WrapAllExcept wraps each Endpoint field of struct Endpoints with a
 // go-kit/kit/endpoint.Middleware.
 // Use this for applying a set of middlewares to every endpoint in the service.
@@ -109,6 +129,7 @@ func (e *Endpoints) WrapAllExcept(middleware endpoint.Middleware, excluded ...st
 		"Hello":             {},
 		"AddUser":           {},
 		"UpdateUserMessage": {},
+		"GetUserMessage":    {},
 	}
 
 	for _, ex := range excluded {
@@ -128,6 +149,9 @@ func (e *Endpoints) WrapAllExcept(middleware endpoint.Middleware, excluded ...st
 		if inc == "UpdateUserMessage" {
 			e.UpdateUserMessageEndpoint = middleware(e.UpdateUserMessageEndpoint)
 		}
+		if inc == "GetUserMessage" {
+			e.GetUserMessageEndpoint = middleware(e.GetUserMessageEndpoint)
+		}
 	}
 }
 
@@ -145,6 +169,7 @@ func (e *Endpoints) WrapAllLabeledExcept(middleware func(string, endpoint.Endpoi
 		"Hello":             {},
 		"AddUser":           {},
 		"UpdateUserMessage": {},
+		"GetUserMessage":    {},
 	}
 
 	for _, ex := range excluded {
@@ -163,6 +188,9 @@ func (e *Endpoints) WrapAllLabeledExcept(middleware func(string, endpoint.Endpoi
 		}
 		if inc == "UpdateUserMessage" {
 			e.UpdateUserMessageEndpoint = middleware("UpdateUserMessage", e.UpdateUserMessageEndpoint)
+		}
+		if inc == "GetUserMessage" {
+			e.GetUserMessageEndpoint = middleware("GetUserMessage", e.GetUserMessageEndpoint)
 		}
 	}
 }

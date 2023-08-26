@@ -27,7 +27,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/pkg/errors"
 	// This service
-	pb "maples"
+	pb "maples/pb"
 )
 
 const contentType = "application/json; charset=utf-8"
@@ -74,6 +74,13 @@ func MakeHTTPHandler(endpoints Endpoints, responseEncoder httptransport.EncodeRe
 	m.Methods("POST").Path("/maples/user_message").Handler(httptransport.NewServer(
 		endpoints.UpdateUserMessageEndpoint,
 		DecodeHTTPUpdateUserMessageZeroRequest,
+		responseEncoder,
+		serverOptions...,
+	))
+
+	m.Methods("GET").Path("/maples/user_message").Handler(httptransport.NewServer(
+		endpoints.GetUserMessageEndpoint,
+		DecodeHTTPGetUserMessageZeroRequest,
 		responseEncoder,
 		serverOptions...,
 	))
@@ -214,6 +221,42 @@ func DecodeHTTPAddUserZeroRequest(_ context.Context, r *http.Request) (interface
 func DecodeHTTPUpdateUserMessageZeroRequest(_ context.Context, r *http.Request) (interface{}, error) {
 	defer r.Body.Close()
 	var req pb.UserMessageRequest
+	buf, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		return nil, errors.Wrapf(err, "cannot read body of http request")
+	}
+	if len(buf) > 0 {
+		// AllowUnknownFields stops the unmarshaler from failing if the JSON contains unknown fields.
+		unmarshaller := jsonpb.Unmarshaler{
+			AllowUnknownFields: true,
+		}
+		if err = unmarshaller.Unmarshal(bytes.NewBuffer(buf), &req); err != nil {
+			const size = 8196
+			if len(buf) > size {
+				buf = buf[:size]
+			}
+			return nil, httpError{errors.Wrapf(err, "request body '%s': cannot parse non-json request body", buf),
+				http.StatusBadRequest,
+				nil,
+			}
+		}
+	}
+
+	pathParams := encodePathParams(mux.Vars(r))
+	_ = pathParams
+
+	queryParams := r.URL.Query()
+	_ = queryParams
+
+	return &req, err
+}
+
+// DecodeHTTPGetUserMessageZeroRequest is a transport/http.DecodeRequestFunc that
+// decodes a JSON-encoded getusermessage request from the HTTP request
+// body. Primarily useful in a server.
+func DecodeHTTPGetUserMessageZeroRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	defer r.Body.Close()
+	var req pb.GetUserMessageRequest
 	buf, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		return nil, errors.Wrapf(err, "cannot read body of http request")

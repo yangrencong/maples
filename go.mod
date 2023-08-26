@@ -1,6 +1,6 @@
 module maples
 
-go 1.18
+go 1.21
 
 require (
 	github.com/go-kit/kit v0.12.0

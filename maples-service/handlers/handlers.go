@@ -9,9 +9,8 @@ import (
 	"maples/maples-service/infra/mysql"
 	"maples/maples-service/module/entity"
 	"maples/maples-service/module/resposiitory"
+	pb "maples/pb"
 	"time"
-
-	pb "maples"
 )
 
 // NewService returns a nave, stateless implementation of Service.
@@ -43,7 +42,7 @@ func (s maplesService) UpdateUserMessage(ctx context.Context, in *pb.UserMessage
 }
 
 func (s maplesService) AddUser(ctx context.Context, in *pb.UserMessageRequest) (*pb.UserMessageResponse, error) {
-	db := mysql.MysqlClient
+	db := mysql.GetMysqlClient()
 	if db == nil {
 		return nil, errors.New("db error")
 	}
@@ -67,4 +66,9 @@ func (s maplesService) AddUser(ctx context.Context, in *pb.UserMessageRequest) (
 		Data: nil,
 	}
 	return resp, nil
+}
+
+func (s maplesService) GetUserMessage(ctx context.Context, in *pb.GetUserMessageRequest) (*pb.GetUserMessageResponse, error) {
+	var resp pb.GetUserMessageResponse
+	return &resp, nil
 }

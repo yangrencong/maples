@@ -13,7 +13,7 @@ service Maples {
     };
   }
 
-  // AddUser 增加用户信息
+  //AddUser 增加用户信息
   rpc AddUser (UserMessageRequest) returns (UserMessageResponse) {
     option (google.api.http) = {
       post:"/maples/user"
@@ -21,7 +21,7 @@ service Maples {
     };
   }
 
-  //  UpdateUserMessage 更新用户信息
+  //UpdateUserMessage 更新用户信息
   rpc UpdateUserMessage (UserMessageRequest) returns (UserMessageResponse) {
     option (google.api.http) = {
       post:"/maples/user_message"
@@ -29,6 +29,26 @@ service Maples {
     };
   }
 
+  //GetUserMessage 获取用户信息
+  rpc GetUserMessage (GetUserMessageRequest) returns (GetUserMessageResponse) {
+    option (google.api.http) = {
+      get:"/maples/user_message"
+      body:"*"
+    };
+  }
+
+}
+
+message GetUserMessageRequest {
+  string name = 1;
+  string phone = 2;
+}
+
+message  GetUserMessageResponse{
+  string name = 1;
+  int32 sex = 2;
+  string birthday = 3;
+  string phone = 4;
 }
 
 message HelloRequest {
