@@ -48,7 +48,7 @@ func (s maplesService) AddUser(ctx context.Context, in *pb.UserMessageRequest) (
 	}
 	user := entity.User{
 		Name:       in.Name,
-		Sex:        int(in.Sex),
+		Sex:        in.Sex,
 		Phone:      in.Phone,
 		Birthday:   in.Birthday,
 		CreateTime: time.Now(),
@@ -69,6 +69,30 @@ func (s maplesService) AddUser(ctx context.Context, in *pb.UserMessageRequest) (
 }
 
 func (s maplesService) GetUserMessage(ctx context.Context, in *pb.GetUserMessageRequest) (*pb.GetUserMessageResponse, error) {
-	var resp pb.GetUserMessageResponse
-	return &resp, nil
+
+	db := mysql.GetMysqlClient()
+	if db == nil {
+		return nil, errors.New("db error")
+	}
+
+	userModel := resposiitory.NewUserModel()
+	userData, err := userModel.Find(ctx, db, &entity.User{
+		Name:  in.Name,
+		Phone: in.Phone,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	resp := &pb.GetUserMessageResponse{
+		Msg:  "SUCCESS",
+		Code: 200,
+		Data: &pb.UserData{
+			Name:     userData.Name,
+			Sex:      userData.Sex,
+			Birthday: userData.Birthday,
+			Phone:    userData.Phone,
+		},
+	}
+	return resp, nil
 }

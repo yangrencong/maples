@@ -36,8 +36,7 @@ service Maples {
   rpc GetUserMessage (GetUserMessageRequest) returns (GetUserMessageResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
     option (google.api.http) = {
-      get:"/maples/user_message"
-      body:"*"
+      get:"/maples/user"
     };
   }
 
@@ -49,6 +48,13 @@ message GetUserMessageRequest {
 }
 
 message  GetUserMessageResponse{
+  string msg = 1;
+  int64 code = 2;
+  UserData data = 3;
+}
+
+
+message  UserData {
   string name = 1;
   int32 sex = 2;
   string birthday = 3;

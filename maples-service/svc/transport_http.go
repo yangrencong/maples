@@ -78,7 +78,7 @@ func MakeHTTPHandler(endpoints Endpoints, responseEncoder httptransport.EncodeRe
 		serverOptions...,
 	))
 
-	m.Methods("GET").Path("/maples/user_message").Handler(httptransport.NewServer(
+	m.Methods("GET").Path("/maples/user").Handler(httptransport.NewServer(
 		endpoints.GetUserMessageEndpoint,
 		DecodeHTTPGetUserMessageZeroRequest,
 		responseEncoder,
@@ -283,6 +283,18 @@ func DecodeHTTPGetUserMessageZeroRequest(_ context.Context, r *http.Request) (in
 
 	queryParams := r.URL.Query()
 	_ = queryParams
+
+	if NameGetUserMessageStrArr, ok := queryParams["name"]; ok {
+		NameGetUserMessageStr := NameGetUserMessageStrArr[0]
+		NameGetUserMessage := NameGetUserMessageStr
+		req.Name = NameGetUserMessage
+	}
+
+	if PhoneGetUserMessageStrArr, ok := queryParams["phone"]; ok {
+		PhoneGetUserMessageStr := PhoneGetUserMessageStrArr[0]
+		PhoneGetUserMessage := PhoneGetUserMessageStr
+		req.Phone = PhoneGetUserMessage
+	}
 
 	return &req, err
 }

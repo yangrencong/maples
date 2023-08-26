@@ -84,7 +84,7 @@ func New(instance string, options ...httptransport.ClientOption) (pb.MaplesServe
 	{
 		GetUserMessageZeroEndpoint = httptransport.NewClient(
 			"GET",
-			copyURL(u, "/maples/user_message"),
+			copyURL(u, "/maples/user"),
 			EncodeHTTPGetUserMessageZeroRequest,
 			DecodeHTTPGetUserMessageResponse,
 			options...,
@@ -388,7 +388,7 @@ func EncodeHTTPGetUserMessageZeroRequest(_ context.Context, r *http.Request, req
 	path := strings.Join([]string{
 		"",
 		"maples",
-		"user_message",
+		"user",
 	}, "/")
 	u, err := url.Parse(path)
 	if err != nil {
@@ -401,6 +401,10 @@ func EncodeHTTPGetUserMessageZeroRequest(_ context.Context, r *http.Request, req
 	values := r.URL.Query()
 	var tmp []byte
 	_ = tmp
+
+	values.Add("name", fmt.Sprint(req.Name))
+
+	values.Add("phone", fmt.Sprint(req.Phone))
 
 	r.URL.RawQuery = values.Encode()
 	return nil
