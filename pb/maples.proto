@@ -8,6 +8,7 @@ service Maples {
 
   // Hello 测试
   rpc Hello (HelloRequest) returns (HelloResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
     option (google.api.http) = {
       get: "/maples/hello"
     };
@@ -15,6 +16,7 @@ service Maples {
 
   //AddUser 增加用户信息
   rpc AddUser (UserMessageRequest) returns (UserMessageResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
     option (google.api.http) = {
       post:"/maples/user"
       body:"*"
@@ -23,6 +25,7 @@ service Maples {
 
   //UpdateUserMessage 更新用户信息
   rpc UpdateUserMessage (UserMessageRequest) returns (UserMessageResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
     option (google.api.http) = {
       post:"/maples/user_message"
       body:"*"
@@ -31,6 +34,7 @@ service Maples {
 
   //GetUserMessage 获取用户信息
   rpc GetUserMessage (GetUserMessageRequest) returns (GetUserMessageResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
     option (google.api.http) = {
       get:"/maples/user_message"
       body:"*"
