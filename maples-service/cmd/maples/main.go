@@ -20,7 +20,7 @@ func main() {
 
 	cfg := server.DefaultConfig
 	cfg = handlers.SetConfig(cfg)
-	mysql.Init()
+	_ = mysql.Init()
 
 	server.Run(cfg)
 }
